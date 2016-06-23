@@ -88,10 +88,32 @@ Compile the two package by typing:
 
     rosmake lsd_slam
 
+### 2.2.1 ROS indigo + Ubuntu 15.10
+If you want to compile LSD-SLAM on Ubuntu 15.10, you have to compile *ROS indigo, g2o, libQGLViwer* all by yourself. The following is a step by step guide.
 
+1. Install ROS indigo from source following this post [Install ROS Indigo in Ubuntu 15.10](http://blog.airobot.og/2016/01/02/install-ros-indigo-in-ubuntu-15-10). Some system packages may have to be downgraded, if you have installed some system updates. The default installation location would be /path/to/ros/indigo/install_isolated, so the command in setcion 2.2:
 
+        rosws init . /opt/ros/indigo
 
+    should be changed to the new ROS installation location, using:
+    
+        rosws init . /path/to/ros/indigo/install_isolated
 
+2. Install g2o from the [git repository](https://github.com/RainerKuemmerle/g2o). Please use **Qt4** because lsd_slam_viewer is only compatible with Qt4. If could, uninstall qt5-qmake using synaptic first.
+
+3. Install libQGLViewer from the [git repository](https://github.com/GillesDebunne/libQGLViewer). Check the output carefully to make sure **Qt4** is used, and uninstall qt5-qmake if necessary.
+
+4. Since the **qreal** default is **double** for g2o library, we have to edit the lsd_slam_viewer source files.
+    ```cpp
+    lsd_slam_viewer/src/PointCloudViewer.h 135:
+    float x,y,z; ->  double x,y,z;
+    
+    lsd_slam_viewer/src/PointCloudViewer.cpp 326:
+    float x,y,z; ->  double x,y,z;
+    ```
+5. Install remaining dependencies using apt-get, and compile the two packages by typing:
+
+        rosmake lsd_slam
 
 ## 2.3 openFabMap for large loop-closure detection [optional]
 If you want to use openFABMAP for large loop closure detection, uncomment the following lines in `lsd_slam_core/CMakeLists.txt` :
